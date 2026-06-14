@@ -9,12 +9,16 @@ class FoxHeartView extends WatchUi.DataField {
 
     hidden var currentHR as Numeric = 0;
     hidden var hr3s as Float = 0.0f;
+    hidden var hrPctStr as String = "--";
+    hidden var hrStr as String = "--";
+    hidden var zoneStr as String = "--";
 
-    hidden var arrHR as Array<Numeric> or Null = null;
+    hidden var smooth3s;
 
     hidden var currentZone as Number = 0;
     hidden var zoneDecimal as Float = 0.0f;
     hidden var numZones as Number = 5;
+    hidden var cachedZoneColor as Number = 0xAAAAAA;
 
     hidden var zoneSystem as Number = 0;
     hidden var frielHrMethod as Number = 0;
@@ -46,6 +50,7 @@ class FoxHeartView extends WatchUi.DataField {
 
     function initialize() {
         DataField.initialize();
+        smooth3s = new FoxHeartMath.RollingAvg(3);
         zoneHistogram = new Array<Float>[5];
         for (var i = 0; i < 5; i++) { zoneHistogram[i] = 0.0f; }
 
@@ -117,7 +122,7 @@ class FoxHeartView extends WatchUi.DataField {
     function compute(info as Activity.Info) as Void {
         var timerState = (info has :timerState) ? info.timerState : 0;
         if (timerState == 0 && prevTimerState != 0) {
-            arrHR = null;
+            smooth3s.reset();
             for (var i = 0; i < zoneHistogram.size(); i++) { zoneHistogram[i] = 0.0f; }
         }
         prevTimerState = timerState;
@@ -126,11 +131,22 @@ class FoxHeartView extends WatchUi.DataField {
             currentHR = info.currentHeartRate;
         } else {
             currentHR = 0;
+            hrPctStr = "--";
+            hrStr = "--";
             return;
         }
 
+        if (maxHR > 0) {
+            hrPctStr = ((currentHR * 100) / maxHR).format("%d") + "%";
+        } else {
+            hrPctStr = "--";
+        }
+        hrStr = currentHR.format("%d");
+
         computeSmoothedHR();
         computeZone();
+
+        zoneStr = currentZone > 0 ? currentZone.format("%d") : "--";
 
         if (currentHR > 0 && currentZone >= 1) {
             var idx = currentZone - 1;
@@ -141,21 +157,7 @@ class FoxHeartView extends WatchUi.DataField {
     }
 
     hidden function computeSmoothedHR() as Void {
-        if (arrHR == null) {
-            arrHR = [currentHR];
-        } else if (arrHR.size() < 30) {
-            arrHR.add(currentHR);
-        } else {
-            arrHR = FoxHeartMath.pushWindow(arrHR, currentHR);
-        }
-
-        var size = arrHR.size();
-        if (size <= 3) {
-            hr3s = FoxHeartMath.mean(arrHR);
-        } else {
-            var slice = arrHR.slice(-3, null);
-            hr3s = FoxHeartMath.mean(slice);
-        }
+        hr3s = smooth3s.update(currentHR);
     }
 
     hidden function computeZone() as Void {
@@ -163,6 +165,7 @@ class FoxHeartView extends WatchUi.DataField {
         if (hr <= 0) {
             currentZone = 0;
             zoneDecimal = 0.0f;
+            cachedZoneColor = Graphics.COLOR_LT_GRAY;
             return;
         }
 
@@ -174,6 +177,7 @@ class FoxHeartView extends WatchUi.DataField {
         }
         currentZone = result[0].toNumber();
         zoneDecimal = result[1];
+        cachedZoneColor = FoxHeartZones.getZoneColor(currentZone, numZones);
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -193,17 +197,18 @@ class FoxHeartView extends WatchUi.DataField {
         for (var i = 0; i < numZones; i++) { total += zoneHistogram[i]; }
         if (total == 0) { return; }
 
+        var invTotal = 1.0f / total;
         var w = zoneWidth - 1;
         for (var z = 0; z < numZones; z++) {
             if (zoneHistogram[z] <= 0) { continue; }
-            var barHeight = ((zoneHistogram[z] / total) * barY).toNumber();
+            var barHeight = ((zoneHistogram[z] * invTotal) * barY).toNumber();
             if (barHeight < 1) { barHeight = 1; }
             dc.setColor(zoneColors[z], -1);
             var xPos = 2 + zoneWidth * z;
             for (var line = 0; line < barHeight; line += 3) {
                 var yPos = barY - line - 2;
                 if (yPos < 0) { break; }
-                dc.drawLine(xPos, yPos, xPos + w, yPos);
+                dc.fillRectangle(xPos, yPos, w, 1);
             }
         }
     }
@@ -224,24 +229,15 @@ class FoxHeartView extends WatchUi.DataField {
 
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
         dc.drawBitmap(2, -2, iconHeart);
-        var zoneColor = FoxHeartZones.getZoneColor(currentZone, numZones);
-        dc.setColor(zoneColor, -1);
-        var zoneStr = currentZone > 0 ? currentZone.format("%d") : "--";
+        dc.setColor(cachedZoneColor, -1);
         dc.drawText(26, -8, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
 
         dc.setColor(fgColor, -1);
-        var pctStr = "--";
-        if (currentHR > 0 && maxHR > 0) {
-            var pct = (currentHR * 100) / maxHR;
-            pctStr = pct.format("%d") + "%";
-        }
-        dc.drawText(fieldWidth - 4, -8, fontLabel, pctStr, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - 4, -8, fontLabel, hrPctStr, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     hidden function drawPrimaryHR(dc as Dc) as Void {
-        var zoneColor = FoxHeartZones.getZoneColor(currentZone, numZones);
-        dc.setColor(zoneColor, -1);
-        var hrStr = currentHR > 0 ? currentHR.format("%d") : "--";
+        dc.setColor(cachedZoneColor, -1);
         dc.drawText(fieldWidth / 2, centerY, primaryFont, hrStr, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }

@@ -10,14 +10,19 @@ class FoxPowerView extends WatchUi.DataField {
     hidden var currentPower as Numeric = 0;
     hidden var power3s as Float = 0.0f;
     hidden var normalizedPower as Numeric = 0;
+    hidden var pwrStr as String = "--";
+    hidden var npStr as String = "--";
+    hidden var zoneStr as String = "1";
 
-    hidden var arrPower as Array<Numeric> or Null = null;
+    hidden var smooth3s;
+    hidden var smooth30s;
     hidden var npCounter as Numeric = 0;
-    hidden var prevNP as Float = 0.0f;
+    hidden var prevAvgP4 as Float = 0.0f;
 
     hidden var currentZone as Number = 1;
     hidden var zoneDecimal as Float = 0.0f;
     hidden var numZones as Number = 7;
+    hidden var cachedZoneColor as Number = 0x009E80;
 
     hidden var zoneSystem as Number = 1;
     hidden var manualFtp as Number = 0;
@@ -47,6 +52,8 @@ class FoxPowerView extends WatchUi.DataField {
 
     function initialize() {
         DataField.initialize();
+        smooth3s = new FoxPowerMath.RollingAvg(3);
+        smooth30s = new FoxPowerMath.RollingAvg(30);
         zoneHistogram = new Array<Float>[7];
         for (var i = 0; i < 7; i++) { zoneHistogram[i] = 0.0f; }
 
@@ -121,9 +128,10 @@ class FoxPowerView extends WatchUi.DataField {
     function compute(info as Activity.Info) as Void {
         var timerState = (info has :timerState) ? info.timerState : 0;
         if (timerState == 0 && prevTimerState != 0) {
-            arrPower = null;
+            smooth3s.reset();
+            smooth30s.reset();
             npCounter = 0;
-            prevNP = 0.0f;
+            prevAvgP4 = 0.0f;
             for (var i = 0; i < zoneHistogram.size(); i++) { zoneHistogram[i] = 0.0f; }
         }
         prevTimerState = timerState;
@@ -132,12 +140,18 @@ class FoxPowerView extends WatchUi.DataField {
             currentPower = info.currentPower;
         } else {
             currentPower = 0;
+            pwrStr = "--";
+            npStr = "--";
             return;
         }
 
         computeRollingPower();
         computeNP();
         computeZone();
+
+        pwrStr = power3s > 0 ? power3s.format("%d") : "--";
+        npStr = normalizedPower > 0 ? normalizedPower.format("%d") : "--";
+        zoneStr = currentZone.format("%d");
 
         if (currentPower > 0 && currentZone >= 1) {
             var idx = currentZone - 1;
@@ -148,31 +162,19 @@ class FoxPowerView extends WatchUi.DataField {
     }
 
     hidden function computeRollingPower() as Void {
-        if (arrPower == null) {
-            arrPower = [currentPower];
-        } else if (arrPower.size() < 30) {
-            arrPower.add(currentPower);
-        } else {
-            arrPower = FoxPowerMath.pushWindow(arrPower, currentPower);
-        }
-
-        var size = arrPower.size();
-        if (size <= 3) {
-            power3s = FoxPowerMath.mean(arrPower);
-        } else {
-            var slice = arrPower.slice(-3, null);
-            power3s = FoxPowerMath.mean(slice);
-        }
+        smooth30s.update(currentPower);
+        power3s = smooth3s.update(currentPower);
     }
 
     hidden function computeNP() as Void {
-        if (arrPower == null || arrPower.size() < 30) {
+        if (!smooth30s.isFull()) {
             normalizedPower = 0;
             return;
         }
-        var avg30s = FoxPowerMath.mean(arrPower);
-        normalizedPower = FoxPowerMath.updateNormalizedPower(prevNP, npCounter, avg30s).toNumber();
-        prevNP = normalizedPower.toFloat();
+        var avg30s = smooth30s.avg();
+        var result = FoxPowerMath.updateNormalizedPower(prevAvgP4, npCounter, avg30s);
+        normalizedPower = result[0].toNumber();
+        prevAvgP4 = result[1];
         npCounter++;
     }
 
@@ -181,6 +183,7 @@ class FoxPowerView extends WatchUi.DataField {
         if (p <= 0) {
             currentZone = 1;
             zoneDecimal = 0.0f;
+            cachedZoneColor = zoneColors[0];
             return;
         }
 
@@ -192,6 +195,7 @@ class FoxPowerView extends WatchUi.DataField {
         }
         currentZone = result[0].toNumber();
         zoneDecimal = result[1];
+        cachedZoneColor = FoxPowerZones.getZoneColor(currentZone, numZones);
     }
 
     function onUpdate(dc as Dc) as Void {
@@ -211,17 +215,18 @@ class FoxPowerView extends WatchUi.DataField {
         for (var i = 0; i < numZones; i++) { total += zoneHistogram[i]; }
         if (total == 0) { return; }
 
+        var invTotal = 1.0f / total;
         var w = zoneWidth - 1;
         for (var z = 0; z < numZones; z++) {
             if (zoneHistogram[z] <= 0) { continue; }
-            var barHeight = ((zoneHistogram[z] / total) * barY).toNumber();
+            var barHeight = ((zoneHistogram[z] * invTotal) * barY).toNumber();
             if (barHeight < 1) { barHeight = 1; }
             dc.setColor(zoneColors[z], -1);
             var xPos = 2 + zoneWidth * z;
             for (var line = 0; line < barHeight; line += 3) {
                 var yPos = barY - line - 2;
                 if (yPos < 0) { break; }
-                dc.drawLine(xPos, yPos, xPos + w, yPos);
+                dc.fillRectangle(xPos, yPos, w, 1);
             }
         }
     }
@@ -242,21 +247,17 @@ class FoxPowerView extends WatchUi.DataField {
 
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
         dc.drawBitmap(2, -2, iconBolt);
-        var zoneColor = FoxPowerZones.getZoneColor(currentZone, numZones);
-        dc.setColor(zoneColor, -1);
-        dc.drawText(26, -8, fontLabel, currentZone.format("%d"), Graphics.TEXT_JUSTIFY_LEFT);
+        dc.setColor(cachedZoneColor, -1);
+        dc.drawText(26, -8, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
 
         dc.setColor(fgColor, -1);
-        var npNumStr = normalizedPower > 0 ? normalizedPower.format("%d") : "--";
-        dc.drawText(fieldWidth - 4, -8, fontLabel, npNumStr, Graphics.TEXT_JUSTIFY_RIGHT);
-        var numW = dc.getTextWidthInPixels(npNumStr, fontLabel);
+        dc.drawText(fieldWidth - 4, -8, fontLabel, npStr, Graphics.TEXT_JUSTIFY_RIGHT);
+        var numW = dc.getTextWidthInPixels(npStr, fontLabel);
         dc.drawText(fieldWidth - 4 - numW - 3, npLabelOffsetY, Graphics.FONT_SMALL, "NP", Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     hidden function drawPrimaryPower(dc as Dc) as Void {
-        var zoneColor = FoxPowerZones.getZoneColor(currentZone, numZones);
-        dc.setColor(zoneColor, -1);
-        var pwrStr = power3s > 0 ? power3s.format("%d") : "--";
+        dc.setColor(cachedZoneColor, -1);
         dc.drawText(fieldWidth / 2, centerY, primaryFont, pwrStr, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }
