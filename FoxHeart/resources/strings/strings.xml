@@ -9,6 +9,4 @@
     <string id="methodHrr">HRR (Heart Rate Reserve)</string>
     <string id="lthr_title">LTHR value (bpm)</string>
     <string id="manualMaxHr_title">Manual Max HR (0 = auto from profile)</string>
-    <string id="zoneBarHeight_title">Zone Bar Height (px)</string>
-    <string id="zoneIndexHeight_title">Active Zone Extra Height (px)</string>
 </strings>

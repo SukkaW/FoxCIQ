@@ -2,8 +2,6 @@
     <properties>
         <property id="zoneSystem" type="number">1</property>
         <property id="manualFtp" type="number">0</property>
-        <property id="zoneBarHeight" type="number">4</property>
-        <property id="zoneIndexHeight" type="number">4</property>
     </properties>
 
     <settings>
@@ -15,12 +13,6 @@
         </setting>
         <setting propertyKey="@Properties.manualFtp" title="@Strings.manualFtp_title">
             <settingConfig type="numeric" min="0" max="600" />
-        </setting>
-        <setting propertyKey="@Properties.zoneBarHeight" title="@Strings.zoneBarHeight_title">
-            <settingConfig type="numeric" min="0" max="15" />
-        </setting>
-        <setting propertyKey="@Properties.zoneIndexHeight" title="@Strings.zoneIndexHeight_title">
-            <settingConfig type="numeric" min="0" max="15" />
         </setting>
     </settings>
 </resources>
