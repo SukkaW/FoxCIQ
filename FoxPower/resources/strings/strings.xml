@@ -1,0 +1,9 @@
+<strings>
+    <string id="AppName">FoxPower</string>
+    <string id="zoneSystem_title">Zone System</string>
+    <string id="zoneGarmin">Garmin 5 Zones</string>
+    <string id="zoneFriel">Friel/Coggan 7 Zones</string>
+    <string id="manualFtp_title">Manual FTP (0 = auto from profile)</string>
+    <string id="zoneBarHeight_title">Zone Bar Height (px)</string>
+    <string id="zoneIndexHeight_title">Active Zone Extra Height (px)</string>
+</strings>

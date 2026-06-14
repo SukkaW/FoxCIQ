@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<iq:manifest xmlns:iq="http://www.garmin.com/xml/connectiq" version="3">
+    <iq:application entry="FoxPowerApp" id="542f1dc5-a86c-44e9-a998-951f7d063ed4"
+        launcherIcon="@Drawables.LauncherIcon" minApiLevel="6.0.0"
+        name="@Strings.AppName" type="datafield" version="1.0.0">
+        <iq:products>
+            <iq:product id="edge540"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="UserProfile"/>
+        </iq:permissions>
+        <iq:languages>
+            <iq:language>eng</iq:language>
+        </iq:languages>
+        <iq:barrels/>
+    </iq:application>
+</iq:manifest>

@@ -1,0 +1,14 @@
+<strings>
+    <string id="AppName">FoxHeart</string>
+    <string id="zoneSystem_title">Zone System</string>
+    <string id="zoneGarmin">Garmin 5 Zones</string>
+    <string id="zoneFriel">Friel 7 Zones</string>
+    <string id="frielHrMethod_title">Friel Zone Calculation Method</string>
+    <string id="methodLthr">LTHR (Lactate Threshold HR)</string>
+    <string id="methodMaxHr">Max HR</string>
+    <string id="methodHrr">HRR (Heart Rate Reserve)</string>
+    <string id="lthr_title">LTHR value (bpm)</string>
+    <string id="manualMaxHr_title">Manual Max HR (0 = auto from profile)</string>
+    <string id="zoneBarHeight_title">Zone Bar Height (px)</string>
+    <string id="zoneIndexHeight_title">Active Zone Extra Height (px)</string>
+</strings>
