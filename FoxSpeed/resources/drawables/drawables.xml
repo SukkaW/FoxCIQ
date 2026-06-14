@@ -1,0 +1,6 @@
+<drawables>
+    <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+    <bitmap id="iconSpeed" filename="images/icon_speed.png" dithering="none" />
+    <bitmap id="iconChevronUp" filename="images/icon_chevron_up.png" dithering="none" />
+    <bitmap id="iconChevronDown" filename="images/icon_chevron_down.png" dithering="none" />
+</drawables>
