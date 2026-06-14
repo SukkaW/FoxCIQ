@@ -1,0 +1,16 @@
+<drawables>
+    <bitmap id="LauncherIcon" filename="launcher_icon.png" />
+    <bitmap id="iconBattery" filename="images/icon_battery.png" dithering="none" />
+    <bitmap id="iconColonWLg" filename="images/icon_colon_w_lg.png" />
+    <bitmap id="iconColonBLg" filename="images/icon_colon_b_lg.png" />
+    <bitmap id="iconColonWSm" filename="images/icon_colon_w_sm.png" />
+    <bitmap id="iconColonBSm" filename="images/icon_colon_b_sm.png" />
+    <bitmap id="gpsWNone" filename="images/icon_gps_w_nosignal.png" dithering="none" />
+    <bitmap id="gpsBNone" filename="images/icon_gps_b_nosignal.png" dithering="none" />
+    <bitmap id="gpsWPoor" filename="images/icon_gps_w_poor.png" dithering="none" />
+    <bitmap id="gpsBPoor" filename="images/icon_gps_b_poor.png" dithering="none" />
+    <bitmap id="gpsWUsable" filename="images/icon_gps_w_usable.png" dithering="none" />
+    <bitmap id="gpsBUsable" filename="images/icon_gps_b_usable.png" dithering="none" />
+    <bitmap id="gpsWGood" filename="images/icon_gps_w_good.png" dithering="none" />
+    <bitmap id="gpsBGood" filename="images/icon_gps_b_good.png" dithering="none" />
+</drawables>
