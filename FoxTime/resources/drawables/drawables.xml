@@ -1,6 +1,13 @@
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png" />
-    <bitmap id="iconBattery" filename="images/icon_battery.png" dithering="none" />
+    <bitmap id="bat0" filename="images/icon_bat_0.png" dithering="none" />
+    <bitmap id="bat1" filename="images/icon_bat_1.png" dithering="none" />
+    <bitmap id="bat2" filename="images/icon_bat_2.png" dithering="none" />
+    <bitmap id="bat3" filename="images/icon_bat_3.png" dithering="none" />
+    <bitmap id="bat4" filename="images/icon_bat_4.png" dithering="none" />
+    <bitmap id="bat5" filename="images/icon_bat_5.png" dithering="none" />
+    <bitmap id="bat6" filename="images/icon_bat_6.png" dithering="none" />
+    <bitmap id="bat7" filename="images/icon_bat_7.png" dithering="none" />
     <bitmap id="iconColonWLg" filename="images/icon_colon_w_lg.png" />
     <bitmap id="iconColonBLg" filename="images/icon_colon_b_lg.png" />
     <bitmap id="iconColonWSm" filename="images/icon_colon_w_sm.png" />
@@ -13,4 +20,5 @@
     <bitmap id="gpsBUsable" filename="images/icon_gps_b_usable.png" dithering="none" />
     <bitmap id="gpsWGood" filename="images/icon_gps_w_good.png" dithering="none" />
     <bitmap id="gpsBGood" filename="images/icon_gps_b_good.png" dithering="none" />
+    <bitmap id="iconSolar" filename="images/icon_solar.png" dithering="none" />
 </drawables>
