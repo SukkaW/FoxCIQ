@@ -33,6 +33,7 @@ class FoxHeartView extends WatchUi.DataField {
     hidden var fontPrimarySm;
     hidden var fontPrimaryXs;
     hidden var fontLabel;
+    hidden var iconHeart;
 
     // Cached layout values (recomputed in onLayout)
     hidden var fieldWidth as Numeric = 140;
@@ -52,6 +53,7 @@ class FoxHeartView extends WatchUi.DataField {
         fontPrimarySm = loadResource(Rez.Fonts.fontPrimarySm);
         fontPrimaryXs = loadResource(Rez.Fonts.fontPrimaryXs);
         fontLabel = loadResource(Rez.Fonts.fontLabel);
+        iconHeart = loadResource(Rez.Drawables.iconHeart);
         primaryFont = fontPrimarySm;
 
         loadSettings();
@@ -221,10 +223,11 @@ class FoxHeartView extends WatchUi.DataField {
     }
 
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
+        dc.drawBitmap(2, -2, iconHeart);
         var zoneColor = FoxHeartZones.getZoneColor(currentZone, numZones);
         dc.setColor(zoneColor, -1);
-        var zoneStr = currentZone > 0 ? "Z" + currentZone.format("%d") : "--";
-        dc.drawText(4, -8, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
+        var zoneStr = currentZone > 0 ? currentZone.format("%d") : "--";
+        dc.drawText(26, -8, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
 
         dc.setColor(fgColor, -1);
         var pctStr = "--";

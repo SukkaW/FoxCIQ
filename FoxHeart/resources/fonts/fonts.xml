@@ -6,5 +6,5 @@
     <font id="fontPrimaryXs" filename="TitilliumWeb-Bold-36.fnt"
           filter="0123456789-" antialias="true" />
     <font id="fontLabel" filename="TitilliumWeb-Bold-22.fnt"
-          filter="0123456789Z%- " antialias="true" />
+          filter="0123456789%- " antialias="true" />
 </fonts>

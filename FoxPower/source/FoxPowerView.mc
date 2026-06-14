@@ -33,6 +33,7 @@ class FoxPowerView extends WatchUi.DataField {
     hidden var fontPrimarySm;
     hidden var fontPrimaryXs;
     hidden var fontLabel;
+    hidden var iconBolt;
 
     // Cached layout values (recomputed in onLayout)
     hidden var fieldWidth as Numeric = 140;
@@ -53,6 +54,7 @@ class FoxPowerView extends WatchUi.DataField {
         fontPrimarySm = loadResource(Rez.Fonts.fontPrimarySm);
         fontPrimaryXs = loadResource(Rez.Fonts.fontPrimaryXs);
         fontLabel = loadResource(Rez.Fonts.fontLabel);
+        iconBolt = loadResource(Rez.Drawables.iconBolt);
         primaryFont = fontPrimarySm;
 
         loadSettings();
@@ -239,9 +241,10 @@ class FoxPowerView extends WatchUi.DataField {
     }
 
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
+        dc.drawBitmap(2, -2, iconBolt);
         var zoneColor = FoxPowerZones.getZoneColor(currentZone, numZones);
         dc.setColor(zoneColor, -1);
-        dc.drawText(4, -8, fontLabel, "Z" + currentZone.format("%d"), Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(26, -8, fontLabel, currentZone.format("%d"), Graphics.TEXT_JUSTIFY_LEFT);
 
         dc.setColor(fgColor, -1);
         var npNumStr = normalizedPower > 0 ? normalizedPower.format("%d") : "--";
