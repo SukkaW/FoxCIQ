@@ -10,11 +10,15 @@ class FoxTimeView extends WatchUi.DataField {
     hidden var hourStr as String = "--";
     hidden var minStr as String = "--";
     hidden var amPmStr as String = "";
+    hidden var is24Hour as Boolean = true;
     hidden var gpsQuality as Number = 0;
-    hidden var batteryPct as Float = 0.0f;
+    hidden var batteryStr as String = "0%";
     hidden var batteryIdx as Number = 0;
     hidden var hasSolar = null;
     hidden var solarPct as Number = 0;
+    hidden var solarStr as String = "";
+
+    hidden var prevMin as Number = -1;
 
     hidden var fontPrimary;
     hidden var fontPrimarySm;
@@ -42,6 +46,9 @@ class FoxTimeView extends WatchUi.DataField {
     hidden var colonHalf as Number = 20;
     hidden var colonShiftX as Number = 0;
     hidden var colonShiftY as Number = 2;
+    hidden var amPmY as Number = 0;
+    hidden var cachedGpsLabelW as Number = 0;
+    hidden var cachedSkipPct as Boolean = false;
 
     function initialize() {
         DataField.initialize();
@@ -80,6 +87,7 @@ class FoxTimeView extends WatchUi.DataField {
         colonW = colonWSm;
         colonB = colonBSm;
 
+        is24Hour = System.getDeviceSettings().is24Hour;
     }
 
     function onLayout(dc as Dc) as Void {
@@ -112,21 +120,26 @@ class FoxTimeView extends WatchUi.DataField {
 
         var fontH = dc.getFontHeight(primaryFont);
         colonGap = (fontH * 0.12f).toNumber();
+        amPmY = fieldHeight - dc.getFontHeight(Graphics.FONT_XTINY);
+        cachedGpsLabelW = dc.getTextWidthInPixels("GPS", Graphics.FONT_XTINY);
     }
 
     function compute(info as Activity.Info) as Void {
         var clockTime = System.getClockTime();
-        var hours = clockTime.hour;
-        var settings = System.getDeviceSettings();
-        if (!settings.is24Hour) {
-            amPmStr = hours >= 12 ? "PM" : "AM";
-            hours = hours % 12;
-            if (hours == 0) { hours = 12; }
-        } else {
-            amPmStr = "";
+        var curMin = clockTime.min;
+        if (curMin != prevMin) {
+            prevMin = curMin;
+            var hours = clockTime.hour;
+            if (!is24Hour) {
+                amPmStr = hours >= 12 ? "PM" : "AM";
+                hours = hours % 12;
+                if (hours == 0) { hours = 12; }
+            } else {
+                amPmStr = "";
+            }
+            hourStr = hours.format("%d");
+            minStr = curMin.format("%02d");
         }
-        hourStr = hours.format("%d");
-        minStr = clockTime.min.format("%02d");
 
         if (info has :currentLocationAccuracy && info.currentLocationAccuracy != null) {
             var acc = info.currentLocationAccuracy;
@@ -147,7 +160,7 @@ class FoxTimeView extends WatchUi.DataField {
 
         var stats = System.getSystemStats();
         var bat = stats.battery;
-        batteryPct = bat > 99.0f ? 99.0f : bat;
+        var batClamped = bat > 99.0f ? 99.0f : bat;
         if (bat >= 90) { batteryIdx = 7; }
         else if (bat >= 77) { batteryIdx = 6; }
         else if (bat >= 64) { batteryIdx = 5; }
@@ -158,10 +171,13 @@ class FoxTimeView extends WatchUi.DataField {
         else { batteryIdx = 0; }
         if (hasSolar == null) {
             hasSolar = (stats has :solarIntensity) && (stats.solarIntensity != null);
+            cachedSkipPct = hasSolar && fieldWidth <= 150;
         }
+        batteryStr = batClamped.format("%d") + (cachedSkipPct ? "" : "%");
         if (hasSolar) {
             var sol = stats.solarIntensity as Number;
             solarPct = sol < 0 ? 0 : sol;
+            solarStr = solarPct.format("%d") + (cachedSkipPct ? "" : "%");
         }
     }
 
@@ -179,9 +195,8 @@ class FoxTimeView extends WatchUi.DataField {
         dc.setColor(fgColor, -1);
         var gpsIconX = 2;
         if (!hasSolar || fieldWidth > 150) {
-            var gpsLabelW = dc.getTextWidthInPixels("GPS", Graphics.FONT_XTINY);
             dc.drawText(2, 3, Graphics.FONT_XTINY, "GPS", Graphics.TEXT_JUSTIFY_LEFT);
-            gpsIconX = 2 + gpsLabelW - 2;
+            gpsIconX = cachedGpsLabelW;
         }
         var gpsIcons = fgColor == Graphics.COLOR_WHITE ? gpsWIcons : gpsBIcons;
         var idx = gpsQuality;
@@ -189,18 +204,15 @@ class FoxTimeView extends WatchUi.DataField {
         if (idx > 4) { idx = 4; }
         dc.drawBitmap(gpsIconX, -2, gpsIcons[idx]);
 
-        var skipPct = hasSolar && fieldWidth <= 150;
-        var batStr = batteryPct.format("%d") + (skipPct ? "" : "%");
-        var batStrW = dc.getTextWidthInPixels(batStr, fontLabelSm);
-        dc.drawText(fieldWidth - 2, -6, fontLabelSm, batStr, Graphics.TEXT_JUSTIFY_RIGHT);
+        var batStrW = dc.getTextWidthInPixels(batteryStr, fontLabelSm);
+        dc.drawText(fieldWidth - 2, -6, fontLabelSm, batteryStr, Graphics.TEXT_JUSTIFY_RIGHT);
         var batIconX = fieldWidth - 2 - batStrW - 14;
         dc.drawBitmap(batIconX, 4, batIcons[batteryIdx]);
 
         if (hasSolar) {
-            var solarStr = solarPct.format("%d") + (skipPct ? "" : "%");
             var solarStrW = dc.getTextWidthInPixels(solarStr, fontLabelSm);
             var solarTotalW = 20 + 1 + solarStrW;
-            var leftEdge = gpsIconX + 24 + (skipPct ? 4 : 0);
+            var leftEdge = gpsIconX + 24 + (cachedSkipPct ? 4 : 0);
             var rightEdge = batIconX;
             var solarX = leftEdge + (rightEdge - leftEdge - solarTotalW) / 2;
             dc.drawBitmap(solarX, 2, iconSolar);
@@ -219,7 +231,7 @@ class FoxTimeView extends WatchUi.DataField {
         dc.drawText(cx + colonGap, cy, primaryFont, minStr, Graphics.TEXT_JUSTIFY_LEFT | Graphics.TEXT_JUSTIFY_VCENTER);
 
         if (amPmStr.length() > 0) {
-            dc.drawText(4, fieldHeight - dc.getFontHeight(Graphics.FONT_XTINY), Graphics.FONT_XTINY, amPmStr, Graphics.TEXT_JUSTIFY_LEFT);
+            dc.drawText(4, amPmY, Graphics.FONT_XTINY, amPmStr, Graphics.TEXT_JUSTIFY_LEFT);
         }
     }
 }

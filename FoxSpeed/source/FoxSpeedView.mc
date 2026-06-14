@@ -15,6 +15,9 @@ class FoxSpeedView extends WatchUi.DataField {
     hidden var rawAvgSpd as Float = 0.0f;
     hidden var hasAvg as Boolean = false;
     hidden var hasCurrent as Boolean = false;
+    hidden var isStatute as Boolean = false;
+    hidden var spdMultiplier as Float = 3.6f;
+    hidden var distDivisor as Float = 1000.0f;
 
     hidden var fontPrimary;
     hidden var fontPrimarySm;
@@ -32,6 +35,11 @@ class FoxSpeedView extends WatchUi.DataField {
     hidden var primaryFont;
     hidden var centerY as Number = 60;
     hidden var isWide as Boolean = false;
+    hidden var cachedUnitW as Number = 0;
+    hidden var cachedUnitFontH as Number = 0;
+    hidden var cachedSpeedFontH as Number = 0;
+    hidden var cachedSecFontH as Number = 0;
+    hidden var cachedDistLabelW as Number = 0;
 
     function initialize() {
         DataField.initialize();
@@ -48,6 +56,20 @@ class FoxSpeedView extends WatchUi.DataField {
         iconChevronDown = loadResource(Rez.Drawables.iconChevronDown);
 
         primaryFont = fontPrimarySm;
+
+        var distUnit = System.getDeviceSettings().distanceUnits;
+        isStatute = distUnit == System.UNIT_STATUTE;
+        if (isStatute) {
+            unitLabel = "mi/h";
+            distLabel = "mi";
+            spdMultiplier = 2.23694f;
+            distDivisor = 1609.344f;
+        } else {
+            unitLabel = "km/h";
+            distLabel = "km";
+            spdMultiplier = 3.6f;
+            distDivisor = 1000.0f;
+        }
     }
 
     function onLayout(dc as Dc) as Void {
@@ -67,45 +89,27 @@ class FoxSpeedView extends WatchUi.DataField {
             }
         }
         centerY = 18 + (fieldHeight - 18) / 2;
+
+        cachedUnitW = dc.getTextWidthInPixels(unitLabel, Graphics.FONT_XTINY);
+        cachedUnitFontH = dc.getFontHeight(Graphics.FONT_XTINY);
+        cachedSpeedFontH = dc.getFontHeight(primaryFont);
+        cachedSecFontH = dc.getFontHeight(fontSecondary);
+        cachedDistLabelW = dc.getTextWidthInPixels(distLabel, Graphics.FONT_XTINY);
     }
 
     function compute(info as Activity.Info) as Void {
-        var settings = System.getDeviceSettings();
-        var distUnit = settings.distanceUnits;
-        if (distUnit == System.UNIT_STATUTE) {
-            unitLabel = "mi/h";
-            distLabel = "mi";
-        } else {
-            unitLabel = "km/h";
-            distLabel = "km";
-        }
-
         if (info has :currentSpeed && info.currentSpeed != null) {
-            var spd = info.currentSpeed as Float;
-            if (distUnit == System.UNIT_STATUTE) {
-                spd = spd * 2.23694f;
-            } else {
-                spd = spd * 3.6f;
-            }
+            var spd = (info.currentSpeed as Float) * spdMultiplier;
             rawCurrentSpd = spd;
             hasCurrent = true;
-            if (spd >= 100.0f) {
-                currentSpeed = spd.format("%d");
-            } else {
-                currentSpeed = spd.format("%.1f");
-            }
+            currentSpeed = spd >= 100.0f ? spd.format("%d") : spd.format("%.1f");
         } else {
             currentSpeed = "--";
             hasCurrent = false;
         }
 
         if (info has :averageSpeed && info.averageSpeed != null) {
-            var avg = info.averageSpeed as Float;
-            if (distUnit == System.UNIT_STATUTE) {
-                avg = avg * 2.23694f;
-            } else {
-                avg = avg * 3.6f;
-            }
+            var avg = (info.averageSpeed as Float) * spdMultiplier;
             rawAvgSpd = avg;
             hasAvg = true;
             avgSpeed = avg.format("%.1f");
@@ -115,17 +119,8 @@ class FoxSpeedView extends WatchUi.DataField {
         }
 
         if (info has :elapsedDistance && info.elapsedDistance != null) {
-            var dist = info.elapsedDistance as Float;
-            if (distUnit == System.UNIT_STATUTE) {
-                dist = dist / 1609.344f;
-            } else {
-                dist = dist / 1000.0f;
-            }
-            if (dist >= 100.0f) {
-                distStr = dist.format("%d");
-            } else {
-                distStr = dist.format("%.1f");
-            }
+            var dist = (info.elapsedDistance as Float) / distDivisor;
+            distStr = dist >= 100.0f ? dist.format("%d") : dist.format("%.1f");
         } else {
             distStr = "--";
         }
@@ -149,25 +144,21 @@ class FoxSpeedView extends WatchUi.DataField {
         dc.drawBitmap(4, 2, iconSpeed);
 
         dc.setColor(fgColor, -1);
-        var unitW = dc.getTextWidthInPixels(unitLabel, Graphics.FONT_XTINY);
         dc.drawText(fieldWidth - 2, 3, Graphics.FONT_XTINY, "avg", Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(fieldWidth - 2 - unitW - 2, -6, fontLabelSm, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - 2 - cachedUnitW - 2, -6, fontLabelSm, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     hidden function drawSpeed(dc as Dc, fgColor as Number) as Void {
         dc.setColor(fgColor, -1);
         var cy = centerY;
-        var unitW = dc.getTextWidthInPixels(unitLabel, Graphics.FONT_XTINY);
-        var unitFontH = dc.getFontHeight(Graphics.FONT_XTINY);
-        var speedFontH = dc.getFontHeight(primaryFont);
-        var speedBottom = cy + speedFontH / 2;
+        var speedBottom = cy + cachedSpeedFontH / 2;
 
-        dc.drawText(fieldWidth - 2, speedBottom - unitFontH - 3, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(fieldWidth - 2 - unitW - 2, cy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(fieldWidth - 2, speedBottom - cachedUnitFontH - 3, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - 2 - cachedUnitW - 2, cy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
 
         if (hasCurrent && hasAvg) {
             var speedW = dc.getTextWidthInPixels(currentSpeed, primaryFont);
-            var speedLeftX = fieldWidth - 2 - unitW - 2 - speedW;
+            var speedLeftX = fieldWidth - 2 - cachedUnitW - 2 - speedW;
             if (rawCurrentSpd > rawAvgSpd) {
                 dc.drawBitmap(speedLeftX - 22, cy - 3, iconChevronUp);
             } else if (rawCurrentSpd < rawAvgSpd) {
@@ -181,16 +172,13 @@ class FoxSpeedView extends WatchUi.DataField {
         var halfW = fieldWidth / 2;
         var cy = fieldHeight / 2;
 
-        // LEFT: speedometer icon + current speed + km/h
         dc.drawBitmap(4, 2, iconSpeed);
 
         var speedCx = halfW / 2 + 20;
         var speedW = dc.getTextWidthInPixels(currentSpeed, primaryFont);
 
-        var speedFontH = dc.getFontHeight(primaryFont);
-        var unitFontH = dc.getFontHeight(Graphics.FONT_XTINY);
         dc.drawText(speedCx, cy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(speedCx + speedW / 2 + 1, cy + speedFontH / 4 - unitFontH, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(speedCx + speedW / 2 + 1, cy + cachedSpeedFontH / 4 - cachedUnitFontH, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_LEFT);
 
         if (hasCurrent && hasAvg) {
             var speedLeftX = speedCx - speedW / 2;
@@ -201,27 +189,20 @@ class FoxSpeedView extends WatchUi.DataField {
             }
         }
 
-        // RIGHT: shared alignment
         var halfH = fieldHeight / 2;
-        var secFontH = dc.getFontHeight(fontSecondary);
-        var tinyFontH = dc.getFontHeight(Graphics.FONT_XTINY);
-        var unitLabelW = dc.getTextWidthInPixels(unitLabel, Graphics.FONT_XTINY);
-        var distLabelW = dc.getTextWidthInPixels(distLabel, Graphics.FONT_XTINY);
-        var maxLabelW = unitLabelW > distLabelW ? unitLabelW : distLabelW;
+        var maxLabelW = cachedUnitW > cachedDistLabelW ? cachedUnitW : cachedDistLabelW;
         var numberRightX = fieldWidth - 2 - maxLabelW - 2;
         var labelLeftX = numberRightX + 2;
 
-        // RIGHT TOP: avg [number] km/h — labels bottom-aligned with digits
         var topCy = halfH / 2;
-        var topLabelY = topCy + secFontH / 4 - tinyFontH;
+        var topLabelY = topCy + cachedSecFontH / 4 - cachedUnitFontH;
         dc.drawText(labelLeftX, topLabelY, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_LEFT);
         dc.drawText(numberRightX, topCy, fontSecondary, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
         var avgW = dc.getTextWidthInPixels(avgSpeed, fontSecondary);
         dc.drawText(numberRightX - avgW - 2, topLabelY, Graphics.FONT_XTINY, "avg", Graphics.TEXT_JUSTIFY_RIGHT);
 
-        // RIGHT BOTTOM: [number] km — labels bottom-aligned with digits, number aligned with top row
         var botCy = halfH + halfH / 2;
-        var botLabelY = botCy + secFontH / 4 - tinyFontH;
+        var botLabelY = botCy + cachedSecFontH / 4 - cachedUnitFontH;
         dc.drawText(labelLeftX, botLabelY, Graphics.FONT_XTINY, distLabel, Graphics.TEXT_JUSTIFY_LEFT);
         dc.drawText(numberRightX, botCy, fontSecondary, distStr, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
