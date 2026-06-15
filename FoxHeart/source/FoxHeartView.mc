@@ -11,12 +11,9 @@ class FoxHeartView extends WatchUi.DataField {
     hidden var hasReceivedData as Boolean = false;
 
     hidden var currentHR as Numeric = 0;
-    hidden var hr3s as Float = 0.0f;
     hidden var hrPctStr as String = "--";
     hidden var hrStr as String = "--";
     hidden var zoneStr as String = "--";
-
-    hidden var smooth3s;
 
     hidden var _zoneResult as Array<Float> = [0.0f, 0.0f];
     hidden var currentZone as Number = 0;
@@ -57,7 +54,6 @@ class FoxHeartView extends WatchUi.DataField {
 
     function initialize() {
         DataField.initialize();
-        smooth3s = new FoxHeartMath.RollingAvg(3);
         zoneHistogram = new Array<Float>[5];
         for (var i = 0; i < 5; i++) { zoneHistogram[i] = 0.0f; }
 
@@ -126,7 +122,6 @@ class FoxHeartView extends WatchUi.DataField {
     function compute(info as Activity.Info) as Void {
         var timerState = (info has :timerState) ? info.timerState : 0;
         if (timerState == 0 && prevTimerState != 0) {
-            smooth3s.reset();
             for (var i = 0; i < zoneHistogram.size(); i++) { zoneHistogram[i] = 0.0f; }
         }
         prevTimerState = timerState;
@@ -148,7 +143,6 @@ class FoxHeartView extends WatchUi.DataField {
         }
         hrStr = currentHR.format("%d");
 
-        computeSmoothedHR();
         computeZone();
 
         zoneStr = currentZone > 0 ? currentZone.format("%d") : "--";
@@ -161,12 +155,8 @@ class FoxHeartView extends WatchUi.DataField {
         }
     }
 
-    hidden function computeSmoothedHR() as Void {
-        hr3s = smooth3s.update(currentHR);
-    }
-
     hidden function computeZone() as Void {
-        var hr = hr3s;
+        var hr = currentHR;
         if (hr <= 0) {
             currentZone = 0;
             zoneDecimal = 0.0f;
