@@ -27,7 +27,6 @@ class FoxPowerView extends WatchUi.DataField {
     hidden var cachedZoneColor as Number = 0x009E80;
 
     hidden var zoneSystem as Number = 1;
-    hidden var manualFtp as Number = 0;
 
     hidden var ftp as Number = 200;
     hidden var thresholds7 as Array<Number> = [110, 150, 180, 210, 240, 300];
@@ -66,35 +65,21 @@ class FoxPowerView extends WatchUi.DataField {
         iconBolt = loadResource(Rez.Drawables.iconBolt);
         primaryFont = fontPrimarySm;
 
+        loadProfile();
         loadSettings();
+    }
+
+    hidden function loadProfile() as Void {
+        var pFtp = FoxPowerZones.getFtp();
+        if (pFtp > 0) { ftp = pFtp; }
+        thresholds5 = FoxPowerZones.getGarminZones();
     }
 
     function loadSettings() as Void {
         if (!(Toybox.Application has :Properties)) { return; }
         zoneSystem = Application.Properties.getValue("zoneSystem");
-        manualFtp = Application.Properties.getValue("manualFtp");
 
         numZones = zoneSystem == 0 ? 5 : 7;
-
-        resolveFtp();
-        resolveZones();
-    }
-
-    hidden function resolveFtp() as Void {
-        if (manualFtp > 0) {
-            ftp = manualFtp;
-            return;
-        }
-        var profileFtp = FoxPowerZones.getFtp();
-        if (profileFtp > 0) {
-            ftp = profileFtp;
-        }
-    }
-
-    hidden function resolveZones() as Void {
-        if (zoneSystem == 0) {
-            thresholds5 = FoxPowerZones.getGarminZones();
-        }
         thresholds7 = FoxPowerZones.buildFrielThresholds(ftp);
 
         zoneColors = FoxPowerZones.getZoneColors(numZones);

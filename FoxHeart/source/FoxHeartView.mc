@@ -27,6 +27,8 @@ class FoxHeartView extends WatchUi.DataField {
     hidden var manualMaxHr as Number = 0;
     hidden var manualRestingHr as Number = 0;
 
+    hidden var profileMaxHR as Number = 190;
+    hidden var profileRestingHR as Number = 60;
     hidden var maxHR as Number = 190;
     hidden var restingHR as Number = 60;
     hidden var garminThresholds as Array<Number> = [117, 144, 160, 171, 189, 192];
@@ -63,7 +65,15 @@ class FoxHeartView extends WatchUi.DataField {
         iconHeart = loadResource(Rez.Drawables.iconHeart);
         primaryFont = fontPrimarySm;
 
+        loadProfile();
         loadSettings();
+    }
+
+    hidden function loadProfile() as Void {
+        garminThresholds = FoxHeartZones.getGarminHrZones();
+        var pMax = FoxHeartZones.getMaxHrFromProfile();
+        if (pMax > 0) { profileMaxHR = pMax; }
+        profileRestingHR = FoxHeartZones.getRestingHr();
     }
 
     function loadSettings() as Void {
@@ -76,24 +86,8 @@ class FoxHeartView extends WatchUi.DataField {
 
         numZones = zoneSystem == 0 ? 5 : 7;
 
-        resolveMaxHR();
-        resolveZones();
-    }
-
-    hidden function resolveMaxHR() as Void {
-        if (manualMaxHr > 0) {
-            maxHR = manualMaxHr;
-            return;
-        }
-        var profileMaxHR = FoxHeartZones.getMaxHrFromProfile();
-        if (profileMaxHR > 0) {
-            maxHR = profileMaxHR;
-        }
-    }
-
-    hidden function resolveZones() as Void {
-        garminThresholds = FoxHeartZones.getGarminHrZones();
-        restingHR = manualRestingHr > 0 ? manualRestingHr : FoxHeartZones.getRestingHr();
+        maxHR = manualMaxHr > 0 ? manualMaxHr : profileMaxHR;
+        restingHR = manualRestingHr > 0 ? manualRestingHr : profileRestingHR;
         frielThresholds = FoxHeartZones.buildFrielThresholds(frielHrMethod, lthr, maxHR, restingHR);
 
         zoneColors = FoxHeartZones.getZoneColors(numZones);
