@@ -112,11 +112,11 @@ class FoxPowerView extends WatchUi.DataField {
         } else {
             primaryFont = fontPrimaryXs;
         }
-        centerY = 18 + (fieldHeight - 8 - 18) / 2;
+        centerY = 18 + (fieldHeight - 8 - 18) / 2 + 2;
 
         var numH = dc.getFontHeight(fontLabel);
         var npH = dc.getFontHeight(Graphics.FONT_SMALL);
-        npLabelOffsetY = -8 + numH - npH - 2;
+        npLabelOffsetY = -12 + numH - npH - 8;
     }
 
     function compute(info as Activity.Info) as Void {
@@ -247,10 +247,10 @@ class FoxPowerView extends WatchUi.DataField {
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
         dc.drawBitmap(2, -2, iconBolt);
         dc.setColor(cachedZoneColor, -1);
-        dc.drawText(26, -8, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(26, -12, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
 
         dc.setColor(fgColor, -1);
-        dc.drawText(fieldWidth - 4, -8, fontLabel, npStr, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - 4, -12, fontLabel, npStr, Graphics.TEXT_JUSTIFY_RIGHT);
         var numW = dc.getTextWidthInPixels(npStr, fontLabel);
         dc.drawText(fieldWidth - 4 - numW - 3, npLabelOffsetY, Graphics.FONT_SMALL, "NP", Graphics.TEXT_JUSTIFY_RIGHT);
     }

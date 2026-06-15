@@ -1,0 +1,17 @@
+info face="Titillium Web" size=-44 bold=1 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=0,0 outline=0
+common lineHeight=69 base=51 scaleW=23 scaleH=339 pages=1 packed=0 alphaChnl=4 redChnl=0 greenChnl=0 blueChnl=0
+page id=0 file="TitilliumWeb-Bold-44.png"
+chars count=13
+char id=32   x=0     y=0     width=0     height=0     xoffset=0     yoffset=0     xadvance=13     page=0  chnl=15
+char id=48   x=0     y=0     width=23     height=32     xoffset=1     yoffset=19     xadvance=26     page=0  chnl=15
+char id=49   x=0     y=33     width=16     height=30     xoffset=3     yoffset=20     xadvance=26     page=0  chnl=15
+char id=50   x=0     y=64     width=20     height=31     xoffset=2     yoffset=19     xadvance=26     page=0  chnl=15
+char id=51   x=0     y=96     width=20     height=32     xoffset=2     yoffset=19     xadvance=26     page=0  chnl=15
+char id=52   x=0     y=129     width=22     height=30     xoffset=1     yoffset=20     xadvance=26     page=0  chnl=15
+char id=53   x=0     y=160     width=21     height=31     xoffset=2     yoffset=20     xadvance=26     page=0  chnl=15
+char id=54   x=0     y=192     width=23     height=32     xoffset=1     yoffset=19     xadvance=26     page=0  chnl=15
+char id=55   x=0     y=225     width=19     height=31     xoffset=3     yoffset=20     xadvance=26     page=0  chnl=15
+char id=56   x=0     y=257     width=23     height=32     xoffset=1     yoffset=19     xadvance=26     page=0  chnl=15
+char id=57   x=0     y=290     width=23     height=32     xoffset=1     yoffset=19     xadvance=26     page=0  chnl=15
+char id=46   x=0     y=323     width=7     height=8     xoffset=2     yoffset=42     xadvance=12     page=0  chnl=15
+char id=45   x=0     y=332     width=14     height=6     xoffset=2     yoffset=35     xadvance=19     page=0  chnl=15

@@ -1,16 +1,20 @@
 <fonts>
     <font id="fontPrimary" filename="TitilliumWeb-Bold-80.fnt"
           filter="0123456789.-" antialias="true" />
-    <font id="fontPrimarySm" filename="TitilliumWeb-Bold-56.fnt"
+    <font id="fontPrimarySm" filename="TitilliumWeb-Bold-64.fnt"
           filter="0123456789.-" antialias="true" />
-    <font id="fontPrimaryXs" filename="TitilliumWeb-Bold-36.fnt"
+    <font id="fontPrimaryXs" filename="TitilliumWeb-Bold-40.fnt"
           filter="0123456789.-" antialias="true" />
-    <font id="fontWide" filename="TitilliumWeb-Bold-48.fnt"
+    <font id="fontWide" filename="TitilliumWeb-Bold-44.fnt"
           filter="0123456789.- " antialias="true" />
-    <font id="fontSecondary" filename="TitilliumWeb-Bold-30.fnt"
+    <font id="fontWideSecondary" filename="TitilliumWeb-Bold-40.fnt"
           filter="0123456789.- " antialias="true" />
-    <font id="fontLabel" filename="TitilliumWeb-Bold-22.fnt"
+    <font id="fontWideSecondarySm" filename="TitilliumWeb-Bold-32.fnt"
+          filter="0123456789.- " antialias="true" />
+    <font id="fontWideSecondaryXs" filename="TitilliumWeb-Bold-20.fnt"
+          filter="0123456789.- " antialias="true" />
+    <font id="fontLabel" filename="TitilliumWeb-Bold-26.fnt"
           filter="0123456789%.- " antialias="true" />
-    <font id="fontLabelSm" filename="TitilliumWeb-Bold-20.fnt"
+    <font id="fontLabelSm" filename="TitilliumWeb-Bold-22.fnt"
           filter="0123456789%.- " antialias="true" />
 </fonts>

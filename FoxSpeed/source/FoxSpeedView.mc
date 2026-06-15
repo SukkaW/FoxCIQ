@@ -23,7 +23,8 @@ class FoxSpeedView extends WatchUi.DataField {
     hidden var fontPrimarySm;
     hidden var fontPrimaryXs;
     hidden var fontWide;
-    hidden var fontSecondary;
+    hidden var fontWideSecondary;
+    hidden var fontWideSecondarySm;
     hidden var fontLabel;
     hidden var fontLabelSm;
     hidden var iconSpeed;
@@ -40,6 +41,7 @@ class FoxSpeedView extends WatchUi.DataField {
     hidden var cachedSpeedFontH as Number = 0;
     hidden var cachedSecFontH as Number = 0;
     hidden var cachedDistLabelW as Number = 0;
+    hidden var cachedLabelFontH as Number = 0;
 
     function initialize() {
         DataField.initialize();
@@ -48,7 +50,8 @@ class FoxSpeedView extends WatchUi.DataField {
         fontPrimarySm = loadResource(Rez.Fonts.fontPrimarySm);
         fontPrimaryXs = loadResource(Rez.Fonts.fontPrimaryXs);
         fontWide = loadResource(Rez.Fonts.fontWide);
-        fontSecondary = loadResource(Rez.Fonts.fontSecondary);
+        fontWideSecondary = loadResource(Rez.Fonts.fontWideSecondary);
+        fontWideSecondarySm = loadResource(Rez.Fonts.fontWideSecondarySm);
         fontLabel = loadResource(Rez.Fonts.fontLabel);
         fontLabelSm = loadResource(Rez.Fonts.fontLabelSm);
         iconSpeed = loadResource(Rez.Drawables.iconSpeed);
@@ -93,8 +96,9 @@ class FoxSpeedView extends WatchUi.DataField {
         cachedUnitW = dc.getTextWidthInPixels(unitLabel, Graphics.FONT_XTINY);
         cachedUnitFontH = dc.getFontHeight(Graphics.FONT_XTINY);
         cachedSpeedFontH = dc.getFontHeight(primaryFont);
-        cachedSecFontH = dc.getFontHeight(fontSecondary);
+        cachedSecFontH = dc.getFontHeight(fontWideSecondarySm);
         cachedDistLabelW = dc.getTextWidthInPixels(distLabel, Graphics.FONT_XTINY);
+        cachedLabelFontH = dc.getFontHeight(fontLabel);
     }
 
     function compute(info as Activity.Info) as Void {
@@ -141,11 +145,11 @@ class FoxSpeedView extends WatchUi.DataField {
     }
 
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
-        dc.drawBitmap(4, 2, iconSpeed);
+        dc.drawBitmap(2, 2, iconSpeed);
 
         dc.setColor(fgColor, -1);
-        dc.drawText(fieldWidth - 2, 3, Graphics.FONT_XTINY, "avg", Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(fieldWidth - 2 - cachedUnitW - 2, -6, fontLabelSm, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - 1, -8 + cachedLabelFontH - cachedUnitFontH - 10, Graphics.FONT_XTINY, "avg", Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - cachedUnitW - 2, -8, fontLabel, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     hidden function drawSpeed(dc as Dc, fgColor as Number) as Void {
@@ -153,16 +157,16 @@ class FoxSpeedView extends WatchUi.DataField {
         var cy = centerY;
         var speedBottom = cy + cachedSpeedFontH / 2;
 
-        dc.drawText(fieldWidth - 2, speedBottom - cachedUnitFontH - 3, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_RIGHT);
-        dc.drawText(fieldWidth - 2 - cachedUnitW - 2, cy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(fieldWidth - 1, speedBottom - cachedUnitFontH - 13, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - cachedUnitW - 2, cy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
 
         if (hasCurrent && hasAvg) {
             var speedW = dc.getTextWidthInPixels(currentSpeed, primaryFont);
-            var speedLeftX = fieldWidth - 2 - cachedUnitW - 2 - speedW;
+            var speedLeftX = fieldWidth - cachedUnitW - 2 - speedW;
             if (rawCurrentSpd > rawAvgSpd) {
-                dc.drawBitmap(speedLeftX - 22, cy - 3, iconChevronUp);
+                dc.drawBitmap(speedLeftX - 16, cy - 4, iconChevronUp);
             } else if (rawCurrentSpd < rawAvgSpd) {
-                dc.drawBitmap(speedLeftX - 22, cy - 3, iconChevronDown);
+                dc.drawBitmap(speedLeftX - 16, cy - 4, iconChevronDown);
             }
         }
     }
@@ -172,20 +176,21 @@ class FoxSpeedView extends WatchUi.DataField {
         var halfW = fieldWidth / 2;
         var cy = fieldHeight / 2;
 
-        dc.drawBitmap(4, 2, iconSpeed);
+        dc.drawBitmap(2, 2, iconSpeed);
 
-        var speedCx = halfW / 2 + 20;
+        var speedCx = halfW / 2 + 11;
+        var speedCy = cy + 6;
         var speedW = dc.getTextWidthInPixels(currentSpeed, primaryFont);
 
-        dc.drawText(speedCx, cy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(speedCx + speedW / 2 + 1, cy + cachedSpeedFontH / 4 - cachedUnitFontH, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(speedCx, speedCy, primaryFont, currentSpeed, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(speedCx + speedW / 2 + 1, speedCy + cachedSpeedFontH / 4 - cachedUnitFontH + 2, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_LEFT);
 
         if (hasCurrent && hasAvg) {
             var speedLeftX = speedCx - speedW / 2;
             if (rawCurrentSpd > rawAvgSpd) {
-                dc.drawBitmap(speedLeftX - 22, cy + 1, iconChevronUp);
+                dc.drawBitmap(speedLeftX - 22, speedCy - 2, iconChevronUp);
             } else if (rawCurrentSpd < rawAvgSpd) {
-                dc.drawBitmap(speedLeftX - 22, cy + 1, iconChevronDown);
+                dc.drawBitmap(speedLeftX - 22, speedCy - 2, iconChevronDown);
             }
         }
 
@@ -194,16 +199,16 @@ class FoxSpeedView extends WatchUi.DataField {
         var numberRightX = fieldWidth - 2 - maxLabelW - 2;
         var labelLeftX = numberRightX + 2;
 
-        var topCy = halfH / 2;
-        var topLabelY = topCy + cachedSecFontH / 4 - cachedUnitFontH;
+        var topCy = halfH / 2 + 1;
+        var topLabelY = topCy + cachedSecFontH / 4 - cachedUnitFontH + 2;
         dc.drawText(labelLeftX, topLabelY, Graphics.FONT_XTINY, unitLabel, Graphics.TEXT_JUSTIFY_LEFT);
-        dc.drawText(numberRightX, topCy, fontSecondary, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
-        var avgW = dc.getTextWidthInPixels(avgSpeed, fontSecondary);
+        dc.drawText(numberRightX, topCy, fontWideSecondarySm, avgSpeed, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+        var avgW = dc.getTextWidthInPixels(avgSpeed, fontWideSecondarySm);
         dc.drawText(numberRightX - avgW - 2, topLabelY, Graphics.FONT_XTINY, "avg", Graphics.TEXT_JUSTIFY_RIGHT);
 
-        var botCy = halfH + halfH / 2;
-        var botLabelY = botCy + cachedSecFontH / 4 - cachedUnitFontH;
+        var botCy = halfH + halfH / 2 - 1;
+        var botLabelY = botCy + cachedSecFontH / 4 - cachedUnitFontH + 2;
         dc.drawText(labelLeftX, botLabelY, Graphics.FONT_XTINY, distLabel, Graphics.TEXT_JUSTIFY_LEFT);
-        dc.drawText(numberRightX, botCy, fontSecondary, distStr, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
+        dc.drawText(numberRightX, botCy, fontWideSecondarySm, distStr, Graphics.TEXT_JUSTIFY_RIGHT | Graphics.TEXT_JUSTIFY_VCENTER);
     }
 }

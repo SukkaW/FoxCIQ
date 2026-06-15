@@ -116,7 +116,7 @@ class FoxHeartView extends WatchUi.DataField {
         } else {
             primaryFont = fontPrimaryXs;
         }
-        centerY = 18 + (fieldHeight - 8 - 18) / 2;
+        centerY = 18 + (fieldHeight - 8 - 18) / 2 + 2;
     }
 
     function compute(info as Activity.Info) as Void {
@@ -229,10 +229,10 @@ class FoxHeartView extends WatchUi.DataField {
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
         dc.drawBitmap(2, -2, iconHeart);
         dc.setColor(cachedZoneColor, -1);
-        dc.drawText(26, -8, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
+        dc.drawText(26, -12, fontLabel, zoneStr, Graphics.TEXT_JUSTIFY_LEFT);
 
         dc.setColor(fgColor, -1);
-        dc.drawText(fieldWidth - 4, -8, fontLabel, hrPctStr, Graphics.TEXT_JUSTIFY_RIGHT);
+        dc.drawText(fieldWidth - 4, -12, fontLabel, hrPctStr, Graphics.TEXT_JUSTIFY_RIGHT);
     }
 
     hidden function drawPrimaryHR(dc as Dc) as Void {
