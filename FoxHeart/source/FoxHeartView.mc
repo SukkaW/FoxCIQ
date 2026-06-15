@@ -7,6 +7,9 @@ import Toybox.WatchUi;
 
 class FoxHeartView extends WatchUi.DataField {
 
+    hidden var profileWarning as String or Null = null;
+    hidden var hasReceivedData as Boolean = false;
+
     hidden var currentHR as Numeric = 0;
     hidden var hr3s as Float = 0.0f;
     hidden var hrPctStr as String = "--";
@@ -72,7 +75,11 @@ class FoxHeartView extends WatchUi.DataField {
     hidden function loadProfile() as Void {
         garminThresholds = FoxHeartZones.getGarminHrZones();
         var pMax = FoxHeartZones.getMaxHrFromProfile();
-        if (pMax > 0) { profileMaxHR = pMax; }
+        if (pMax > 0) {
+            profileMaxHR = pMax;
+        } else {
+            profileWarning = "No Max HR in profile";
+        }
         profileRestingHR = FoxHeartZones.getRestingHr();
     }
 
@@ -126,6 +133,7 @@ class FoxHeartView extends WatchUi.DataField {
 
         if (info has :currentHeartRate && info.currentHeartRate != null) {
             currentHR = info.currentHeartRate;
+            hasReceivedData = true;
         } else {
             currentHR = 0;
             hrPctStr = "--";
@@ -181,6 +189,11 @@ class FoxHeartView extends WatchUi.DataField {
         var fgColor = bgColor == Graphics.COLOR_BLACK ? Graphics.COLOR_WHITE : Graphics.COLOR_BLACK;
         dc.setColor(fgColor, bgColor);
         dc.clear();
+
+        if (profileWarning != null && !hasReceivedData) {
+            dc.drawText(fieldWidth / 2, fieldHeight / 2, Graphics.FONT_SMALL, profileWarning, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            return;
+        }
 
         drawHistogram(dc);
         drawZoneBar(dc, fgColor);

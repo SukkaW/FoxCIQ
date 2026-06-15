@@ -7,6 +7,9 @@ import Toybox.WatchUi;
 
 class FoxPowerView extends WatchUi.DataField {
 
+    hidden var profileWarning as String or Null = null;
+    hidden var hasReceivedData as Boolean = false;
+
     hidden var currentPower as Numeric = 0;
     hidden var power3s as Float = 0.0f;
     hidden var normalizedPower as Numeric = 0;
@@ -71,7 +74,11 @@ class FoxPowerView extends WatchUi.DataField {
 
     hidden function loadProfile() as Void {
         var pFtp = FoxPowerZones.getFtp();
-        if (pFtp > 0) { ftp = pFtp; }
+        if (pFtp > 0) {
+            ftp = pFtp;
+        } else {
+            profileWarning = "No FTP in profile";
+        }
         thresholds5 = FoxPowerZones.getGarminZones();
     }
 
@@ -125,6 +132,7 @@ class FoxPowerView extends WatchUi.DataField {
 
         if (info has :currentPower && info.currentPower != null) {
             currentPower = info.currentPower;
+            hasReceivedData = true;
         } else {
             currentPower = 0;
             pwrStr = "--";
@@ -189,6 +197,11 @@ class FoxPowerView extends WatchUi.DataField {
         var fgColor = bgColor == Graphics.COLOR_BLACK ? Graphics.COLOR_WHITE : Graphics.COLOR_BLACK;
         dc.setColor(fgColor, bgColor);
         dc.clear();
+
+        if (profileWarning != null && !hasReceivedData) {
+            dc.drawText(fieldWidth / 2, fieldHeight / 2, Graphics.FONT_SMALL, profileWarning, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            return;
+        }
 
         drawHistogram(dc);
         drawZoneBar(dc, fgColor);
