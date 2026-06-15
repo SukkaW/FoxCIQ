@@ -10,6 +10,8 @@ If you like my work, please consider supporting me on [GitHub Sponsors](https://
 
 ## FoxPower
 
+[![Available on Connect IQ](https://img.skk.moe/gh/available-on-connect-iq.svg)](https://apps.garmin.com/apps/58f6278d-9eb4-4602-ab93-690ac43c3760)
+
 Real-time cycling power data field with 3-second smoothed power, Normalized Power (NP), zone indicator, and zone time histogram.
 
 This data field uses the latest Garmin Connect IQ SDK and API, and we can fetch your FTP directly from your Garmin User Profile. Thus, we do not provide manual input for FTP. You must update your FTP in Garmin Connect instead.
@@ -24,6 +26,8 @@ Supports Garmin 5-zone and Friel/Coggan 7-zone systems (configurable via setting
 </table>
 
 ## FoxHeart
+
+[![Available on Connect IQ](https://img.skk.moe/gh/available-on-connect-iq.svg)](https://apps.garmin.com/apps/fd97a90f-1efe-4cf7-8c16-8414412f129c)
 
 Heart rate data field with 3-second-smoothed HR, %MaxHR, zone indicator, and zone-time histogram.
 
@@ -40,6 +44,8 @@ Supports Garmin 5-zone and Friel 7-zone systems (configurable via settings). Fri
 
 ## FoxSpeed
 
+[![Available on Connect IQ](https://img.skk.moe/gh/available-on-connect-iq.svg)](https://apps.garmin.com/apps/26cbc49f-798f-49d2-902b-089e646804b3)
+
 Speed and distance data field with current speed, average speed, distance (only on wider layout), and speed trend indicator.
 
 |                                 |                                 |
@@ -47,6 +53,8 @@ Speed and distance data field with current speed, average speed, distance (only 
 | ![](_Screenshots/FoxSpeed1.png) | ![](_Screenshots/FoxSpeed2.png) |
 
 ## FoxTime
+
+[![Available on Connect IQ](https://img.skk.moe/gh/available-on-connect-iq.svg)](https://apps.garmin.com/apps/50524886-4537-4b21-aecb-cf5093c016b3)
 
 Clock, GPS signal status, and battery data field, with optional solar intensity.
 
