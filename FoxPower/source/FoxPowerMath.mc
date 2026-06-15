@@ -45,7 +45,7 @@ module FoxPowerMath {
         }
     }
 
-    function updateNormalizedPower(prevAvgP4 as Float, counter as Numeric, avg30s as Numeric) as Array<Float> {
+    function updateNormalizedPower(prevAvgP4 as Float, counter as Numeric, avg30s as Numeric, out as Array<Float>) as Void {
         var p4 = avg30s.toFloat();
         p4 = p4 * p4;
         p4 = p4 * p4;
@@ -55,6 +55,7 @@ module FoxPowerMath {
         } else {
             avgP4 = prevAvgP4 + (p4 - prevAvgP4) / (counter + 1);
         }
-        return [Math.pow(avgP4, 0.25).toFloat(), avgP4];
+        out[0] = Math.pow(avgP4, 0.25).toFloat();
+        out[1] = avgP4;
     }
 }

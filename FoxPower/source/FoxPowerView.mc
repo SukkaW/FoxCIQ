@@ -19,6 +19,8 @@ class FoxPowerView extends WatchUi.DataField {
     hidden var npCounter as Numeric = 0;
     hidden var prevAvgP4 as Float = 0.0f;
 
+    hidden var _zoneResult as Array<Float> = [0.0f, 0.0f];
+    hidden var _npResult as Array<Float> = [0.0f, 0.0f];
     hidden var currentZone as Number = 1;
     hidden var zoneDecimal as Float = 0.0f;
     hidden var numZones as Number = 7;
@@ -172,9 +174,9 @@ class FoxPowerView extends WatchUi.DataField {
             return;
         }
         var avg30s = smooth30s.avg();
-        var result = FoxPowerMath.updateNormalizedPower(prevAvgP4, npCounter, avg30s);
-        normalizedPower = result[0].toNumber();
-        prevAvgP4 = result[1];
+        FoxPowerMath.updateNormalizedPower(prevAvgP4, npCounter, avg30s, _npResult);
+        normalizedPower = _npResult[0].toNumber();
+        prevAvgP4 = _npResult[1];
         npCounter++;
     }
 
@@ -187,14 +189,13 @@ class FoxPowerView extends WatchUi.DataField {
             return;
         }
 
-        var result;
         if (zoneSystem == 0 && thresholds5 != null) {
-            result = FoxPowerZones.calcZone5(p, thresholds5);
+            FoxPowerZones.calcZone5(p, thresholds5, _zoneResult);
         } else {
-            result = FoxPowerZones.calcZone7(p, thresholds7);
+            FoxPowerZones.calcZone7(p, thresholds7, _zoneResult);
         }
-        currentZone = result[0].toNumber();
-        zoneDecimal = result[1];
+        currentZone = _zoneResult[0].toNumber();
+        zoneDecimal = _zoneResult[1];
         cachedZoneColor = FoxPowerZones.getZoneColor(currentZone, numZones);
     }
 

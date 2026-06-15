@@ -65,45 +65,63 @@ module FoxHeartZones {
         return t;
     }
 
-    function calcZone7(hr as Numeric, thresholds as Array<Number>) as Array<Float> {
+    function calcZone7(hr as Numeric, thresholds as Array<Number>, out as Array<Float>) as Void {
         if (hr == null || hr <= 0) {
-            return [0.0f, 0.0f];
+            out[0] = 0.0f;
+            out[1] = 0.0f;
+            return;
         }
         if (hr <= thresholds[0]) {
-            return [1.0f, hr.toFloat() / thresholds[0]];
+            out[0] = 1.0f;
+            out[1] = hr.toFloat() / thresholds[0];
+            return;
         }
         if (hr > thresholds[5]) {
             var dec = (hr - thresholds[5]).toFloat() / (thresholds[5] * 0.2);
-            return [7.0f, dec > 1.0 ? 1.0f : dec];
+            out[0] = 7.0f;
+            out[1] = dec > 1.0 ? 1.0f : dec;
+            return;
         }
         for (var i = 1; i < 6; i++) {
             if (hr > thresholds[i - 1] && hr <= thresholds[i]) {
                 var lo = thresholds[i - 1].toFloat();
                 var hi = thresholds[i].toFloat();
-                return [(i + 1).toFloat(), (hr.toFloat() - lo) / (hi - lo)];
+                out[0] = (i + 1).toFloat();
+                out[1] = (hr.toFloat() - lo) / (hi - lo);
+                return;
             }
         }
-        return [1.0f, 0.0f];
+        out[0] = 1.0f;
+        out[1] = 0.0f;
     }
 
-    function calcZone5(hr as Numeric, thresholds as Array<Number>) as Array<Float> {
+    function calcZone5(hr as Numeric, thresholds as Array<Number>, out as Array<Float>) as Void {
         if (hr == null || hr <= 0) {
-            return [0.0f, 0.0f];
+            out[0] = 0.0f;
+            out[1] = 0.0f;
+            return;
         }
         if (hr < thresholds[0]) {
-            return [0.0f, 0.0f];
+            out[0] = 0.0f;
+            out[1] = 0.0f;
+            return;
         }
         if (hr > thresholds[5]) {
-            return [5.0f, 1.0f];
+            out[0] = 5.0f;
+            out[1] = 1.0f;
+            return;
         }
         for (var i = 1; i < 6; i++) {
             if (hr > thresholds[i - 1] && hr <= thresholds[i]) {
                 var lo = thresholds[i - 1].toFloat();
                 var hi = thresholds[i].toFloat();
-                return [i.toFloat(), (hr.toFloat() - lo) / (hi - lo)];
+                out[0] = i.toFloat();
+                out[1] = (hr.toFloat() - lo) / (hi - lo);
+                return;
             }
         }
-        return [0.0f, 0.0f];
+        out[0] = 0.0f;
+        out[1] = 0.0f;
     }
 
     function getZoneColor(zone as Number, numZones as Number) as Number {

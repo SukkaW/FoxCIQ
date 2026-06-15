@@ -30,36 +30,53 @@ module FoxPowerZones {
         return t;
     }
 
-    function calcZone7(power as Numeric, thresholds as Array<Number>) as Array<Float> {
+    function calcZone7(power as Numeric, thresholds as Array<Number>, out as Array<Float>) as Void {
         if (power == null || power <= 0) {
-            return [1.0f, 0.0f];
+            out[0] = 1.0f;
+            out[1] = 0.0f;
+            return;
         }
         if (power <= thresholds[0]) {
-            return [1.0f, power.toFloat() / thresholds[0]];
+            out[0] = 1.0f;
+            out[1] = power.toFloat() / thresholds[0];
+            return;
         }
         if (power > thresholds[5]) {
             var dec = (power - thresholds[5]).toFloat() / (thresholds[5] * 0.5);
-            return [7.0f, dec > 1.0 ? 1.0f : dec];
+            out[0] = 7.0f;
+            out[1] = dec > 1.0 ? 1.0f : dec;
+            return;
         }
         for (var i = 1; i < 6; i++) {
             if (power > thresholds[i - 1] && power <= thresholds[i]) {
                 var lo = thresholds[i - 1].toFloat();
                 var hi = thresholds[i].toFloat();
-                return [(i + 1).toFloat(), (power.toFloat() - lo) / (hi - lo)];
+                out[0] = (i + 1).toFloat();
+                out[1] = (power.toFloat() - lo) / (hi - lo);
+                return;
             }
         }
-        return [1.0f, 0.0f];
+        out[0] = 1.0f;
+        out[1] = 0.0f;
     }
 
-    function calcZone5(power as Numeric, thresholds as Array<Number>) as Array<Float> {
+    function calcZone5(power as Numeric, thresholds as Array<Number>, out as Array<Float>) as Void {
         if (power == null || power <= 0) {
-            return [1.0f, 0.0f];
+            out[0] = 1.0f;
+            out[1] = 0.0f;
+            return;
         }
         var numZones = thresholds.size() - 1;
-        if (numZones < 1) { return [1.0f, 0.0f]; }
+        if (numZones < 1) {
+            out[0] = 1.0f;
+            out[1] = 0.0f;
+            return;
+        }
 
         if (power < thresholds[0]) {
-            return [1.0f, 0.0f];
+            out[0] = 1.0f;
+            out[1] = 0.0f;
+            return;
         }
 
         for (var i = 1; i <= numZones; i++) {
@@ -67,10 +84,13 @@ module FoxPowerZones {
             if (power >= thresholds[i - 1] && power < thresholds[i]) {
                 var lo = thresholds[i - 1].toFloat();
                 var hi = thresholds[i].toFloat();
-                return [i.toFloat(), (power.toFloat() - lo) / (hi - lo)];
+                out[0] = i.toFloat();
+                out[1] = (power.toFloat() - lo) / (hi - lo);
+                return;
             }
         }
-        return [numZones.toFloat(), 1.0f];
+        out[0] = numZones.toFloat();
+        out[1] = 1.0f;
     }
 
     function getZoneColor(zone as Number, numZones as Number) as Number {

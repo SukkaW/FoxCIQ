@@ -15,6 +15,7 @@ class FoxHeartView extends WatchUi.DataField {
 
     hidden var smooth3s;
 
+    hidden var _zoneResult as Array<Float> = [0.0f, 0.0f];
     hidden var currentZone as Number = 0;
     hidden var zoneDecimal as Float = 0.0f;
     hidden var numZones as Number = 5;
@@ -169,14 +170,13 @@ class FoxHeartView extends WatchUi.DataField {
             return;
         }
 
-        var result;
         if (zoneSystem == 0) {
-            result = FoxHeartZones.calcZone5(hr, garminThresholds);
+            FoxHeartZones.calcZone5(hr, garminThresholds, _zoneResult);
         } else {
-            result = FoxHeartZones.calcZone7(hr, frielThresholds);
+            FoxHeartZones.calcZone7(hr, frielThresholds, _zoneResult);
         }
-        currentZone = result[0].toNumber();
-        zoneDecimal = result[1];
+        currentZone = _zoneResult[0].toNumber();
+        zoneDecimal = _zoneResult[1];
         cachedZoneColor = FoxHeartZones.getZoneColor(currentZone, numZones);
     }
 
