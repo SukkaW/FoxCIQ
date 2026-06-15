@@ -14,7 +14,7 @@ class FoxTimeView extends WatchUi.DataField {
     hidden var gpsQuality as Number = 0;
     hidden var batteryStr as String = "0%";
     hidden var batteryIdx as Number = 0;
-    hidden var hasSolar = null;
+    hidden var _hasSolar = null;
     hidden var solarPct as Number = 0;
     hidden var solarStr as String = "";
 
@@ -49,6 +49,15 @@ class FoxTimeView extends WatchUi.DataField {
     hidden var amPmY as Number = 0;
     hidden var cachedGpsLabelW as Number = 0;
     hidden var cachedSkipPct as Boolean = false;
+
+    hidden function getHasSolar() as Boolean {
+        if (_hasSolar == null) {
+            var stats = System.getSystemStats();
+            _hasSolar = (stats has :solarIntensity) && (stats.solarIntensity != null);
+            cachedSkipPct = _hasSolar && fieldWidth <= 150;
+        }
+        return _hasSolar;
+    }
 
     function initialize() {
         DataField.initialize();
@@ -169,12 +178,8 @@ class FoxTimeView extends WatchUi.DataField {
         else if (bat >= 25) { batteryIdx = 2; }
         else if (bat >= 12) { batteryIdx = 1; }
         else { batteryIdx = 0; }
-        if (hasSolar == null) {
-            hasSolar = (stats has :solarIntensity) && (stats.solarIntensity != null);
-            cachedSkipPct = hasSolar && fieldWidth <= 150;
-        }
         batteryStr = batClamped.format("%d") + (cachedSkipPct ? "" : "%");
-        if (hasSolar) {
+        if (getHasSolar()) {
             var sol = stats.solarIntensity as Number;
             solarPct = sol < 0 ? 0 : sol;
             solarStr = solarPct.format("%d") + (cachedSkipPct ? "" : "%");
@@ -194,7 +199,7 @@ class FoxTimeView extends WatchUi.DataField {
     hidden function drawTopBar(dc as Dc, fgColor as Number) as Void {
         dc.setColor(fgColor, -1);
         var gpsIconX = 2;
-        if (!hasSolar || fieldWidth > 150) {
+        if (!getHasSolar() || fieldWidth > 150) {
             dc.drawText(2, 3, Graphics.FONT_XTINY, "GPS", Graphics.TEXT_JUSTIFY_LEFT);
             gpsIconX = cachedGpsLabelW;
         }
@@ -209,7 +214,7 @@ class FoxTimeView extends WatchUi.DataField {
         var batIconX = fieldWidth - 2 - batStrW - 14;
         dc.drawBitmap(batIconX, 4, batIcons[batteryIdx]);
 
-        if (hasSolar) {
+        if (getHasSolar()) {
             var solarStrW = dc.getTextWidthInPixels(solarStr, fontLabelSm);
             var solarTotalW = 20 + 1 + solarStrW;
             var leftEdge = gpsIconX + 24 + (cachedSkipPct ? 4 : 0);
