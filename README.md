@@ -16,7 +16,12 @@ This data field uses the latest Garmin Connect IQ SDK and API, and we can fetch 
 
 Supports Garmin 5-zone and Friel/Coggan 7-zone systems (configurable via settings).
 
-![](_Screenshots/FoxPower1.png)
+<table>
+<tr>
+<td width="50%"><img src="_Screenshots/FoxPower1.png"></td>
+<td width="50%"></td>
+</tr>
+</table>
 
 ## FoxHeart
 
@@ -26,22 +31,27 @@ This data field can fetch your Max HR and HRR directly from your Garmin User Pro
 
 Supports Garmin 5-zone and Friel 7-zone systems (configurable via settings). Friel zones can be calculated from LTHR (requires manual input of LTHR), Max HR (can either be read from Garmin User Profile automatically or be set manually), or Heart Rate Reserve (HRR; both Max HR and Resting HR can be read from Garmin User Profile automatically or set manually).
 
-![](_Screenshots/FoxHeart1.png)
+<table>
+<tr>
+<td width="50%"><img src="_Screenshots/FoxHeart1.png"></td>
+<td width="50%"></td>
+</tr>
+</table>
 
 ## FoxSpeed
 
 Speed and distance data field with current speed, average speed, distance (only on wider layout), and speed trend indicator.
 
 |                                 |                                 |
-| ------------------------------- | ------------------------------- |
+| :-----------------------------: | :-----------------------------: |
 | ![](_Screenshots/FoxSpeed1.png) | ![](_Screenshots/FoxSpeed2.png) |
 
-### FoxTime
+## FoxTime
 
 Clock, GPS signal status, and battery data field, with optional solar intensity.
 
 |                                |                                |
-| ------------------------------ | ------------------------------ |
+| :----------------------------: | :----------------------------: |
 | ![](_Screenshots/FoxTime1.png) | ![](_Screenshots/FoxTime2.png) |
 
 ## Device Compatibility
