@@ -25,6 +25,7 @@ class FoxHeartView extends WatchUi.DataField {
     hidden var frielHrMethod as Number = 0;
     hidden var lthr as Number = 170;
     hidden var manualMaxHr as Number = 0;
+    hidden var manualRestingHr as Number = 0;
 
     hidden var maxHR as Number = 190;
     hidden var restingHR as Number = 60;
@@ -71,6 +72,7 @@ class FoxHeartView extends WatchUi.DataField {
         frielHrMethod = Application.Properties.getValue("frielHrMethod");
         lthr = Application.Properties.getValue("lthr");
         manualMaxHr = Application.Properties.getValue("manualMaxHr");
+        manualRestingHr = Application.Properties.getValue("manualRestingHr");
 
         numZones = zoneSystem == 0 ? 5 : 7;
 
@@ -91,7 +93,7 @@ class FoxHeartView extends WatchUi.DataField {
 
     hidden function resolveZones() as Void {
         garminThresholds = FoxHeartZones.getGarminHrZones();
-        restingHR = FoxHeartZones.getRestingHr();
+        restingHR = manualRestingHr > 0 ? manualRestingHr : FoxHeartZones.getRestingHr();
         frielThresholds = FoxHeartZones.buildFrielThresholds(frielHrMethod, lthr, maxHR, restingHR);
 
         zoneColors = FoxHeartZones.getZoneColors(numZones);

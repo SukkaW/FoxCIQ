@@ -9,4 +9,5 @@
     <string id="methodHrr">HRR (Heart Rate Reserve)</string>
     <string id="lthr_title">LTHR value (bpm)</string>
     <string id="manualMaxHr_title">Manual Max HR (0 = auto from profile)</string>
+    <string id="manualRestingHr_title">Manual Resting HR (0 = auto from profile)</string>
 </strings>

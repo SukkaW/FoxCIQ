@@ -4,6 +4,7 @@
         <property id="frielHrMethod" type="number">0</property>
         <property id="lthr" type="number">170</property>
         <property id="manualMaxHr" type="number">0</property>
+        <property id="manualRestingHr" type="number">0</property>
     </properties>
 
     <settings>
@@ -25,6 +26,9 @@
         </setting>
         <setting propertyKey="@Properties.manualMaxHr" title="@Strings.manualMaxHr_title">
             <settingConfig type="numeric" min="0" max="230" />
+        </setting>
+        <setting propertyKey="@Properties.manualRestingHr" title="@Strings.manualRestingHr_title">
+            <settingConfig type="numeric" min="0" max="120" />
         </setting>
     </settings>
 </resources>
