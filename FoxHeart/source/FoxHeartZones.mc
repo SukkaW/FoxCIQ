@@ -13,7 +13,10 @@ module FoxHeartZones {
 
     function getGarminHrZones() as Array<Number> {
         var thresholds = UserProfile.getHeartRateZones(UserProfile.HR_ZONE_SPORT_BIKING);
-        if (thresholds == null || thresholds.size() < 6 || thresholds[0] == null || thresholds[0] == 0) {
+        if (thresholds == null) {
+            thresholds = UserProfile.getHeartRateZones(UserProfile.HR_ZONE_SPORT_GENERIC);
+        }
+        if (thresholds == null) {
             return [117, 144, 160, 171, 189, 192];
         }
         return thresholds;
@@ -21,7 +24,10 @@ module FoxHeartZones {
 
     function getMaxHrFromProfile() as Number {
         var zones = UserProfile.getHeartRateZones(UserProfile.HR_ZONE_SPORT_BIKING);
-        if (zones != null && zones.size() >= 6 && zones[5] != null && zones[5] > 0) {
+        if (zones == null) {
+            zones = UserProfile.getHeartRateZones(UserProfile.HR_ZONE_SPORT_GENERIC);
+        }
+        if (zones != null && zones.size() >= 6) {
             return zones[5];
         }
         return 0;

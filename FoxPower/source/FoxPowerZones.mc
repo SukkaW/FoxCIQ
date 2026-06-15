@@ -19,7 +19,11 @@ module FoxPowerZones {
     }
 
     function getGarminZones() as Array<Number> or Null {
-        return UserProfile.getPowerZones(Activity.SPORT_CYCLING);
+        var zones = UserProfile.getPowerZones(Activity.SPORT_CYCLING);
+        if (zones == null) {
+            zones = UserProfile.getPowerZones(Activity.SPORT_GENERIC);
+        }
+        return zones;
     }
 
     function buildFrielThresholds(ftp as Number) as Array<Number> {
